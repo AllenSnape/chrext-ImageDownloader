@@ -1,0 +1,24 @@
+{
+    "name": "ImageDownloader",
+    "description": "网页图片下载器",
+    "version": "1.0",
+    "manifest_version": 2,
+    "browser_action": {
+        "default_popup": "index.html"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ],
+    "permissions": [
+        "activeTab",
+        "<all_urls>",
+        "downloads"
+    ]
+}
