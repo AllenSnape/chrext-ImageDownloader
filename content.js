@@ -4,7 +4,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         const imgs = document.body.querySelectorAll(msg.selector);
         const imgSrcs = [];
         for (const img of imgs) {
-            imgSrcs.push(img.src);
+            if (img.src) imgSrcs.push(img.src);
         }
         sendResponse(imgSrcs);
     }
