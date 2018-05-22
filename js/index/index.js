@@ -18,14 +18,16 @@ function getImgsByCssSelector(selector, selected) {
 // 下载链接
 function download() {
     for (let i = 0; i < scannedImgs.length; i++) {
+        const img = scannedImgs[i];
+        if (img === null) continue;
         chrome.downloads.download({
-            url: scannedImgs[i],
+            url: img,
             filename: 
             ($('#savePath').val() + ($('#savePath').val()[$('#savePath').val().length - 1] === '/' ? '' : '/')) + 
             (
-                scannedImgs[i].startsWith('data:') ? 
-                (i + '.' + scannedImgs[i].substring(scannedImgs[i].indexOf('/') + 1, scannedImgs[i].indexOf(';'))) :
-                scannedImgs[i].substring(scannedImgs[i].lastIndexOf('/') + 1, scannedImgs[i].length)
+                img.startsWith('data:') ? 
+                (i + '.' + img.substring(img.indexOf('/') + 1, img.indexOf(';'))) :
+                img.substring(img.lastIndexOf('/') + 1, img.indexOf('?') === -1 ? img.length : img.indexOf('?'))
             )
         });
     }
@@ -62,7 +64,7 @@ function showImgs() {
         const img = scannedImgs[i];
         $('#imgViewer').append(
             `
-                <div class="col-xs-12" imgIndex="` + i + `">
+                <div class="col-xs-12" imgIndex="` + i + `" style="z-index: ` + (scannedImgs.length - i) + `;">
                     <img src="` + img + `" />
                     <img src="` + img + `" />
                 </div>
@@ -73,10 +75,22 @@ function showImgs() {
     $('#imgViewer').children('div').bind({
         click: function() {
             thiz = $(this);
-            scannedImgs.splice(thiz.attr('imgIndex'), 1);
+            scannedImgs[thiz.attr('imgIndex') * 1] = null;
             thiz.fadeOut(150, function() {
                 thiz.remove();
             });
+
+            // 如果删除完了则禁用下载按钮
+            let allNulled = true;
+            for (const img of scannedImgs) {
+                if (img !== null) {
+                    allNulled = false;
+                    break;
+                }
+            }
+            if (allNulled) {
+                DomUtil.freeze($('#confirmBtn').get(0));
+            }
         }
     });
     // 显示出场动画
@@ -87,16 +101,121 @@ function showImgs() {
     }
 }
 
+// 记忆输入框在localStorage中key的前缀
+const REMEMBERED_INPUTS_PREFIX = 'rememberedInputs_';
+// 根据提供的key获取localStorage中的数据
+function getRememberedInputs(key) {
+    // 获取localStorage的数据
+    let rememberedInputs = localStorage.getItem(key);
+    try {
+        // 格式化数据
+        rememberedInputs = JSON.parse(rememberedInputs);
+        // 检查数据
+        rememberedInputs = rememberedInputs === null || rememberedInputs === undefined || !rememberedInputs instanceof Array ? [] : rememberedInputs;
+    } catch (e) {
+        rememberedInputs = [];
+    }
+    return rememberedInputs;
+}
+// 刷新记忆输入框的保存值
+function writeToLocalStorage(dom) {
+    // 离开时输入框的值
+    const value = dom.val();
+    if (value === undefined || value === null || value === '') return;
+    // 获取localStorage的key
+    const key = REMEMBERED_INPUTS_PREFIX + dom.attr('rememberable');
+    // 获取设置保存的最多条数
+    let count = dom.attr('rememberable-data-count') * 1;
+    // 默认5条
+    count = count && count > 0 ? count : 5;
+    // 获取localStorage中的值
+    const rememberedInputs = getRememberedInputs(key);
+    // 添加到localStorage
+    if (rememberedInputs.includes(value)) {
+        rememberedInputs.splice(rememberedInputs.indexOf(value), 1);
+    }
+    rememberedInputs.push(value);
+    // 检查是否超出设定值, 超出的切除
+    if (rememberedInputs.length > count) rememberedInputs.splice(0, rememberedInputs.length - count);
+    // 重新保存
+    localStorage.setItem(key, JSON.stringify(rememberedInputs));
+}
+
 $(function () {
+    // 绑定扫描按钮事件
+    $('#scanBtn').bind({
+        click: function() {
+            writeToLocalStorage($('#savePath'));
+            writeToLocalStorage($('#queryStr'));
+            scanImgs();
+        }
+    });
+    // 绑定下载按钮事件
     $('#confirmBtn').bind({
         click: function () {
             download();
         }
     });
 
-    $('#scanBtn').bind({
-        click: function() {
-            scanImgs();
+    // 初始化"记忆输入框"
+    let fadeOutTimeoutFlag = undefined;
+    let fadeInTimeoutFlag = undefined;
+    function fadeOut($dom) {
+        clearTimeout(fadeInTimeoutFlag);
+        $dom.css({
+            opacity: 0
+        });
+        fadeOutTimeoutFlag = setTimeout(() => {
+            $dom.hide();
+        }, 150);
+    }
+    function fadeIn($dom) {
+        clearTimeout(fadeOutTimeoutFlag);
+        $dom.show();
+        $dom.css({
+            opacity: 1
+        });
+    }
+    $('body').append(`
+        <div id="rememberedInputsBox" style="display: none;">
+            
+        </div>
+    `);
+    $('[rememberable]').bind({
+        blur: function() {
+            // 隐藏待选框
+            fadeOut($('#rememberedInputsBox'));
+        },
+        focus: function() {
+            // 获取localStorage中的数据
+            const key = REMEMBERED_INPUTS_PREFIX + $(this).attr('rememberable');
+            const rememberedInputs = getRememberedInputs(key).reverse();
+
+            // 清空预选框
+            $('#rememberedInputsBox').empty();
+            // 循环添加到dom
+            for (const input of rememberedInputs) {
+                $('#rememberedInputsBox').append(`
+                    <div for="` + $(this).attr('rememberable') + `">` + input + `</div>
+                `);
+            }
+            // 给预选项添加点击事件, 点击之后将内部显示的值回填到输入框, 并隐藏预选框
+            $('#rememberedInputsBox > div').bind({
+                click: function() {
+                    $('[rememberable=' + $(this).attr('for') + ']').val($(this).text());
+                    fadeOut($('#rememberedInputsBox'));
+                }
+            });
+
+            // 设置预选框的位置
+            const position = DomUtil.getDomPosition($(this).get(0));
+            $('#rememberedInputsBox').css({
+                top: position.y + 36 + 'px',
+                left: position.x + 'px',
+                width: $(this).css('width')
+            });
+            // 显示预选框
+            fadeIn($('#rememberedInputsBox'));
         }
     });
 

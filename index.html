@@ -52,6 +52,46 @@
             margin-bottom: 15px;
         }
 
+        #rememberedInputsBox{
+            position: absolute;
+            background-color: #fff;
+            width: 100%;
+            box-shadow: 0px 0px 20px 0px;
+            border-radius: 4px;
+            transition: 0.15s;
+            z-index: 9999;
+        }
+        #rememberedInputsBox::after {
+            content: ' ';
+            position: absolute;
+            background-color: #eee;
+            width: 30%;
+            height: 100%;
+            top: 0;
+            right: 0;
+        }
+        #rememberedInputsBox > div:first-child {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        #rememberedInputsBox > div:last-child {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        #rememberedInputsBox > div {
+            height: 34px;
+            line-height: 34px;
+            width: 100%;
+            padding: 0 15px;
+            cursor: pointer;
+        }
+        #rememberedInputsBox > div:hover {
+            background-color: #eee;
+        }
+        #rememberedInputsBox > div:active {
+            background-color: #ddd;
+        }
+
         .btn-fullwidth {
             width: 100%;
         }
@@ -63,13 +103,13 @@
         <form class="form-horizontal" id="infoform">
             <div class="form-group">
                 <div class="col-xs-12">
-                    <input class="form-control" type="text" id="savePath" placeholder="保存地址; 基于浏览器默认下载地址" value="autodownload/">
+                    <input class="form-control" rememberable="savePath" rememberable-data-count="3" type="text" id="savePath" placeholder="保存地址; 基于浏览器默认下载地址">
                 </div>
                 <!-- <button type="button" class="btn btn-primary col-xs-2">选择</button> -->
             </div>
             <div class="form-group">
                 <div class="col-xs-10">
-                    <input class="form-control" type="text" id="queryStr" placeholder="CSS选择器" value="img">
+                    <input class="form-control" rememberable="queryStr" rememberable-data-count="1" type="text" id="queryStr" placeholder="CSS选择器">
                 </div>
                 <div class="col-xs-2 form-btn-box">
                     <button type="button" class="btn btn-primary btn-fullwidth" id="scanBtn">扫描</button>
