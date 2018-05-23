@@ -18,17 +18,26 @@ function getImgsByCssSelector(selector, selected) {
 // 下载链接
 function download() {
     for (let i = 0; i < scannedImgs.length; i++) {
-        const img = scannedImgs[i];
+        const url = scannedImgs[i];
+        let img = url;
         if (img === null) continue;
+
+        // base64数据是以data开头
+        if (img.startsWith('data:')) {
+            // 截取出文件格式, 以便组成文件名
+            img = i + '.' + img.substring(img.indexOf('/') + 1, img.indexOf(';'));
+        } 
+        // 其他的就是URL的格式
+        else {
+            // 先判断是否存在问号, 存在问号则先去除问号后的内容
+            img = img.indexOf('?') === -1 ? img : img.substring(0, img.indexOf('?'));
+            // 获取去除?后的URL的最后一节, 一般都是文件名了
+            img = img.substring(img.lastIndexOf('/') + 1, img.length);
+        }
+
         chrome.downloads.download({
-            url: img,
-            filename: 
-            ($('#savePath').val() + ($('#savePath').val()[$('#savePath').val().length - 1] === '/' ? '' : '/')) + 
-            (
-                img.startsWith('data:') ? 
-                (i + '.' + img.substring(img.indexOf('/') + 1, img.indexOf(';'))) :
-                img.substring(img.lastIndexOf('/') + 1, img.indexOf('?') === -1 ? img.length : img.indexOf('?'))
-            )
+            url: url,
+            filename: ($('#savePath').val() + ($('#savePath').val()[$('#savePath').val().length - 1] === '/' ? '' : '/')) + img
         });
     }
 }
