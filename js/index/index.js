@@ -18,10 +18,14 @@ function getImgsByCssSelector(selector, selected) {
 // 下载链接
 function download() {
     for (let i = 0; i < scannedImgs.length; i++) {
+        // 保存路径
+        const path = $('#savePath').val();
+        // 图片链接
         const url = scannedImgs[i];
-        let img = url;
-        if (img === null) continue;
+        if (url === null) continue;
 
+        // 获取图片名称和格式
+        let img = url;
         // base64数据是以data开头
         if (img.startsWith('data:')) {
             // 截取出文件格式, 以便组成文件名
@@ -37,7 +41,7 @@ function download() {
 
         chrome.downloads.download({
             url: url,
-            filename: ($('#savePath').val() + ($('#savePath').val()[$('#savePath').val().length - 1] === '/' ? '' : '/')) + img
+            filename: (['', '/', '\\'].includes(path) ? '' : (path + (path[path.length - 1] === '/' ? '' : '/'))) + img
         });
     }
 }
