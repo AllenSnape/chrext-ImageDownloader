@@ -33,6 +33,7 @@ function download() {
         } 
         // 其他的就是URL的格式
         else {
+            img.replace(/\\/gi, '/');
             // 先判断是否存在问号, 存在问号则先去除问号后的内容
             img = img.indexOf('?') === -1 ? img : img.substring(0, img.indexOf('?'));
             // 获取去除?后的URL的最后一节, 一般都是文件名了
