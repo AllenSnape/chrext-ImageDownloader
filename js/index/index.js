@@ -80,7 +80,6 @@ function showImgs() {
             `
                 <div class="col-xs-12" imgIndex="` + i + `" style="z-index: ` + (scannedImgs.length - i) + `;">
                     <img src="` + img + `" />
-                    <img src="` + img + `" />
                 </div>
             `
         );
