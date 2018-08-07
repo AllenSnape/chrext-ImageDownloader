@@ -44,6 +44,9 @@ function download() {
             url: url.src,
             filename: (['', '/', '\\'].includes(path) ? '' : (path + (path[path.length - 1] === '/' ? '' : '/'))) + img
         });
+
+        // 下载后从列表删除
+        // $('#imgViewer > div[imgIndex=' + i + ']').trigger('click');
     }
 }
 
@@ -78,7 +81,7 @@ function showImgs() {
         const img = scannedImgs[i];
         $('#imgViewer').append(
             `
-                <div class="col-xs-12" imgIndex="` + i + `" style="z-index: ` + (scannedImgs.length - i) + `;">
+                <div class="col-xs-12" imgIndex="` + i + `">
                     <img src="` + img.src + `" />
                 </div>
             `
@@ -91,21 +94,26 @@ function showImgs() {
             scannedImgs[thiz.attr('imgIndex') * 1] = null;
             thiz.fadeOut(150, function() {
                 thiz.remove();
-            });
 
-            // 如果删除完了则禁用下载按钮
-            let allNulled = true;
-            for (const img of scannedImgs) {
-                if (img !== null) {
-                    allNulled = false;
-                    break;
+                // 如果删除完了则禁用下载按钮
+                let allNulled = true;
+                for (const img of scannedImgs) {
+                    if (img !== null) {
+                        allNulled = false;
+                        break;
+                    }
                 }
-            }
-            if (allNulled) {
-                DomUtil.freeze($('#confirmBtn').get(0));
-            }
+                if (allNulled) {
+                    DomUtil.freeze($('#confirmBtn').get(0));
+                }
+            });
         }
     });
+    /* $('#imgViewer > div').children('img').on({
+        load: function () {
+            console.log(this, 'loaded');
+        }
+    }); */
     // 显示出场动画
     if (scannedImgs.length === 0) {
         $('#imgViewer').fadeOut();
