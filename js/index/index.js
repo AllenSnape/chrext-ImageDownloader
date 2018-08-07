@@ -25,7 +25,7 @@ function download() {
         if (url === null) continue;
 
         // 获取图片名称和格式
-        let img = url;
+        let img = url.src;
         // base64数据是以data开头
         if (img.startsWith('data:')) {
             // 截取出文件格式, 以便组成文件名
@@ -41,7 +41,7 @@ function download() {
         }
 
         chrome.downloads.download({
-            url: url,
+            url: url.src,
             filename: (['', '/', '\\'].includes(path) ? '' : (path + (path[path.length - 1] === '/' ? '' : '/'))) + img
         });
     }
@@ -79,7 +79,7 @@ function showImgs() {
         $('#imgViewer').append(
             `
                 <div class="col-xs-12" imgIndex="` + i + `" style="z-index: ` + (scannedImgs.length - i) + `;">
-                    <img src="` + img + `" />
+                    <img src="` + img.src + `" />
                 </div>
             `
         );
