@@ -17,6 +17,15 @@ function getImgsByCssSelector(selector, selected) {
 
 // 下载链接
 function download() {
+    // 应该下载的图片数量
+    let predictionDownloaded = 0;
+    // 获取应下载数量
+    for (const i of scannedImgs) {
+        if (i !== null) predictionDownloaded++;
+    }
+
+    // 已下载了的图片数量
+    let downloaded = 0;
     for (let i = 0; i < scannedImgs.length; i++) {
         // 保存路径
         const path = $('#savePath').val();
@@ -45,9 +54,20 @@ function download() {
             img = (i + 1) + (img.includes('.') ? img.substring(img.lastIndexOf('.'), img.length) : '');
         }
 
+        // 下载文件
         chrome.downloads.download({
             url: url.src,
             filename: (['', '/', '\\'].includes(path) ? '' : (path + (path[path.length - 1] === '/' ? '' : '/'))) + img
+        }, (downloadId) => {
+            if (++downloaded === predictionDownloaded) {
+                setTimeout(() => {
+                    // 打开下载文件夹
+                    chrome.downloads.showDefaultFolder();
+            
+                    // 关闭popup
+                    setTimeout(() => window.close());
+                });
+            }
         });
 
         // 下载后从列表删除
