@@ -62,7 +62,7 @@ function download() {
             if (++downloaded === predictionDownloaded) {
                 setTimeout(() => {
                     // 打开下载文件夹
-                    chrome.downloads.showDefaultFolder();
+                    // chrome.downloads.showDefaultFolder();
             
                     // 关闭popup
                     setTimeout(() => window.close());
