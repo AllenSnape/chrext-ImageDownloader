@@ -40,6 +40,11 @@ function download() {
             img = img.substring(img.lastIndexOf('/') + 1, img.length);
         }
 
+        // 如果useDisplayedIndex被选中则使用(i+1)作为文件名称
+        if ($('#useDisplayedIndex:checked').length > 0) {
+            img = (i + 1) + (img.includes('.') ? img.substring(img.lastIndexOf('.'), img.length) : '');
+        }
+
         chrome.downloads.download({
             url: url.src,
             filename: (['', '/', '\\'].includes(path) ? '' : (path + (path[path.length - 1] === '/' ? '' : '/'))) + img
@@ -115,11 +120,11 @@ function showImgs() {
         }
     }); */
     // 显示出场动画
-    if (scannedImgs.length === 0) {
+    /* if (scannedImgs.length === 0) {
         $('#imgViewer').fadeOut();
     } else {
         $('#imgViewer').fadeIn();
-    }
+    } */
 }
 
 // 记忆输入框在localStorage中key的前缀

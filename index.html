@@ -20,7 +20,44 @@
             padding-left: 0px;
         }
 
+        #infoform .index-filename-checkbox {
+            line-height: 34px;
+            padding-left: 8px;
+            cursor: pointer;
+        }
+        #infoform .index-filename-checkbox > input[type=checkbox] {
+            display: none;
+        }
+        #infoform .index-filename-checkbox > label {
+            margin: 0;
+            cursor: pointer;
+        }
+        #infoform .index-filename-checkbox > label > .glyphicon-ok {
+            display: none;
+        }
+        #infoform .index-filename-checkbox > input[type=checkbox]:checked +  label > .glyphicon-ok {
+            display: block;
+        }
+        #infoform .index-filename-checkbox > input[type=checkbox]:checked +  label > .glyphicon-remove {
+            display: none;
+        }
+
+        #confirmBtn:not([disabled]) {
+            margin-top: 15px;
+        }
+        #confirmBtn {
+            margin-bottom: 15px;
+        }
+
+        .btn-fullwidth {
+            width: 100%;
+        }
+    </style>
+
+    <!-- 图片查看列表 -->
+    <style>
         #imgViewer {
+            min-height: 50px;
             max-height: 400px;
             overflow-y: scroll;
         }
@@ -42,14 +79,10 @@
         #imgViewer > div > img {
             width: 100%;
         }
+    </style>
 
-        #confirmBtn:not([disabled]) {
-            margin-top: 15px;
-        }
-        #confirmBtn {
-            margin-bottom: 15px;
-        }
-
+    <!-- 记忆输入框样式 -->
+    <style>
         #rememberedInputsBox{
             position: absolute;
             background-color: #fff;
@@ -89,10 +122,6 @@
         #rememberedInputsBox > div:active {
             background-color: #ddd;
         }
-
-        .btn-fullwidth {
-            width: 100%;
-        }
     </style>
 </head>
 
@@ -100,14 +129,21 @@
     <div class="container">
         <form class="form-horizontal" id="infoform">
             <div class="form-group">
-                <div class="col-xs-12">
-                    <input class="form-control" rememberable="savePath" rememberable-data-count="3" type="text" id="savePath" placeholder="保存地址; 基于浏览器默认下载地址" disableautocomplete="" autocomplete="off">
+                <div class="col-xs-11">
+                    <input class="form-control" rememberable="savePath" rememberable-data-count="4" type="text" id="savePath" placeholder="保存地址; 基于浏览器默认下载地址" disableautocomplete="" autocomplete="off">
+                </div>
+                <div class="col-xs-1 index-filename-checkbox" title="是否使用图片序列作为图片文件名">
+                    <input type="checkbox" id="useDisplayedIndex" lay-skin="switch">
+                    <label for="useDisplayedIndex">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    </label>
                 </div>
                 <!-- <button type="button" class="btn btn-primary col-xs-2">选择</button> -->
             </div>
             <div class="form-group">
                 <div class="col-xs-10">
-                    <input class="form-control" rememberable="queryStr" rememberable-data-count="1" type="text" id="queryStr" placeholder="CSS选择器" disableautocomplete="" autocomplete="off">
+                    <input class="form-control" rememberable="queryStr" rememberable-data-count="3" type="text" id="queryStr" placeholder="CSS选择器" disableautocomplete="" autocomplete="off">
                 </div>
                 <div class="col-xs-2 form-btn-box">
                     <button type="button" class="btn btn-primary btn-fullwidth" id="scanBtn">扫描</button>
