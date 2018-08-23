@@ -20,6 +20,9 @@ class ImageDownloaderContentScript {
     constructor (chrome, document) {
         this.chrome = chrome;
         this.document = document;
+
+    // 扫描出来的图片
+        this.imageList = [];
     }
 
     /**
@@ -31,7 +34,22 @@ class ImageDownloaderContentScript {
             switch(msg.text) {
                 // 根据CSS选择器获取图片信息
                 case ImageDownloaderMsgDict.getImgsByCssSelector: {
-                    // 扫描出来的图片
+
+                    const imgs = [];
+
+                    this.imageList = this.document.querySelectorAll(msg.selector);
+                    for (let i = 0; i < this.imageList.length; i++) {
+                        this.getBlobFromImg(this.imageList[i], (url, params) => {
+                            imgs[params.index] = {src: url};
+
+                            if (params.index === this.imageList.length - 1) {
+                                console.log(imgs);
+                                sendResponse(imgs);
+                            }
+                        }, {index: i});
+                    }
+
+                    /* // 扫描出来的图片
                     const imgSource = this.document.body.querySelectorAll(msg.selector);
                     // 返回的图片集合
                     const imgs = [];
@@ -57,10 +75,31 @@ class ImageDownloaderContentScript {
                     }
 
                     // 返回图片
-                    sendResponse(imgs);
+                    sendResponse(imgs); */
                 } break;
                 default: console.warn('未知消息命令!')
             }
+        });
+    }
+    
+    /**
+     * 获取img标签blob的url
+     * @param {HTMLImageElement} img 图片标签
+     * @param {Function} gotBlob     获取到blob之后的回调
+     * @param {any} params           回调调用时返回的参数
+     */
+    getBlobFromImg(img, gotBlob, params) {
+        // 创建canvas对象
+        const canvas = document.createElement("canvas");
+        // 设置画布大小
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        // 填充图片
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        // 获取图片blob
+        canvas.toBlob((b) => {
+            gotBlob.call(this, URL.createObjectURL(b), params);
         });
     }
 
