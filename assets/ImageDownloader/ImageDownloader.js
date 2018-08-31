@@ -35,7 +35,7 @@ class ImageDownloaderContentScript {
                 // 根据CSS选择器获取图片信息
                 case ImageDownloaderMsgDict.getImgsByCssSelector: {
 
-                    const imgs = [];
+                    /* const imgs = [];
 
                     this.imageList = this.document.querySelectorAll(msg.selector);
                     for (let i = 0; i < this.imageList.length; i++) {
@@ -47,9 +47,9 @@ class ImageDownloaderContentScript {
                                 sendResponse(imgs);
                             }
                         }, {index: i});
-                    }
+                    } */
 
-                    /* // 扫描出来的图片
+                    // 扫描出来的图片
                     const imgSource = this.document.body.querySelectorAll(msg.selector);
                     // 返回的图片集合
                     const imgs = [];
@@ -75,7 +75,7 @@ class ImageDownloaderContentScript {
                     }
 
                     // 返回图片
-                    sendResponse(imgs); */
+                    sendResponse(imgs);
                 } break;
                 default: console.warn('未知消息命令!')
             }
